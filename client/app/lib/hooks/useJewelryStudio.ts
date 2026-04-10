@@ -278,14 +278,14 @@ export function useJewelryStudio() {
   };
 
   useEffect(() => {
-    if (storedImages.length === 0 && currentIndex !== -1) {
+    if (totalImages === 0 && currentIndex !== -1) {
       setCurrentIndex(-1);
       return;
     }
-    if (storedImages.length > 0 && currentIndex >= storedImages.length) {
-      setCurrentIndex(storedImages.length - 1);
+    if (totalImages > 0 && currentIndex >= totalImages) {
+      setCurrentIndex(totalImages - 1);
     }
-  }, [storedImages.length, currentIndex]);
+  }, [totalImages, currentIndex]);
 
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
