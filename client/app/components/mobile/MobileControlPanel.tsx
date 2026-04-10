@@ -34,6 +34,7 @@ interface MobileControlPanelProps {
   isExportEnabled: boolean;
   onBackToGenerate: () => void;
   images: string[];
+  sessionUploads: Set<string>;
   currentImage?: string;
   currentIndex: number;
   totalImages: number;
@@ -52,7 +53,7 @@ export default function MobileControlPanel({
   rates, setGoldPrice, setGold8Price, setSilverPrice, date, setDate, priceDropNote, setPriceDropNote,
   onGenerate, onDownload, onShare, onReset, onSyncDB, onBackToGenerate,
   isGenerating, isDownloading, isSharing, isSyncing, isExportEnabled,
-  images, currentImage, currentIndex, totalImages,
+  images, sessionUploads, currentImage, currentIndex, totalImages,
   currentPage, totalPages, goToPage,
   onSelectImage, onDeleteImage, isLoadingImages, imageError,
   onUploadPhotos, isUploadingPhotos,
@@ -111,16 +112,11 @@ export default function MobileControlPanel({
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={onSyncDB} disabled={isSyncing}
-              className="py-3 rounded-xl flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest border border-yellow-500/20 text-yellow-500/60 bg-yellow-500/5 active:scale-95 transition-all disabled:opacity-30"
-            >
-              {isSyncing ? 'SYNCING...' : '🔄 SYNC DB'}
-            </button>
+          <div className="flex flex-col gap-3">
             <button onClick={onReset}
-              className="py-3 rounded-xl flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest border border-yellow-900/20 text-yellow-900/40 bg-yellow-900/5 active:scale-95 transition-all"
+              className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest border border-yellow-900/20 text-yellow-900/40 bg-yellow-900/5 active:scale-95 transition-all"
             >
-              RESET SEQ
+              RESET SEQUENCE
             </button>
           </div>
         </div>
@@ -160,7 +156,7 @@ export default function MobileControlPanel({
           currentImage={currentImage}
           onSelectImage={onSelectImage}
           onDeleteImage={onDeleteImage}
-          showDelete={editMode}
+          canDeleteImage={(src) => editMode && sessionUploads.has(src)}
           isLoading={isLoadingImages}
           error={imageError}
           columnsClassName="grid-cols-2"

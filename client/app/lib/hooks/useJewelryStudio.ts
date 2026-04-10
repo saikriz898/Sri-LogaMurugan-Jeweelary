@@ -12,6 +12,7 @@ export function useJewelryStudio() {
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [totalImages, setTotalImages] = useState(0);
   const [storedImages, setStoredImages] = useState<string[]>([]);
+  const [sessionUploads, setSessionUploads] = useState<Set<string>>(new Set());
   const [isLoadingImages, setIsLoadingImages] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -237,6 +238,16 @@ export function useJewelryStudio() {
         batch.forEach(f => formData.append('photos', f));
         const res = await fetch(`${API_URL}/api/upload-images`, { method: 'POST', body: formData });
         if (!res.ok) throw new Error(`Upload failed: ${res.statusText}`);
+        const data = await res.json();
+        const urls = new Set<string>();
+        if (data.files) {
+          const apiBase = API_URL.replace(/\/$/, '');
+          data.files.forEach((f: any) => {
+            if (f.compressedUrl) urls.add(f.compressedUrl.startsWith('http') ? f.compressedUrl : `${apiBase}${f.compressedUrl}`);
+            if (f.imageUrl) urls.add(f.imageUrl.startsWith('http') ? f.imageUrl : `${apiBase}${f.imageUrl}`);
+          });
+        }
+        setSessionUploads(prev => new Set([...prev, ...urls]));
         uploadedCount += batch.length;
         setUploadProgress({ completed: uploadedCount, total: files.length, message: `Uploaded ${uploadedCount}/${files.length} images` });
       }
@@ -323,7 +334,7 @@ export function useJewelryStudio() {
     priceDropNote, setPriceDropNote,
     currentImage,
     currentIndex, totalImages,
-    storedImages,
+    storedImages, sessionUploads,
     isLoadingImages, imageError,
     activeMetal, setActiveMetal,
     isConnected,

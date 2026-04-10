@@ -8,7 +8,7 @@ interface ImageLibraryGridProps {
   isLoading?: boolean;
   error?: string | null;
   columnsClassName?: string;
-  showDelete?: boolean; // explicit control — only show delete when caller wants it
+  canDeleteImage?: (src: string) => boolean; // dynamic deletion gate
 }
 
 export default function ImageLibraryGrid({
@@ -19,7 +19,7 @@ export default function ImageLibraryGrid({
   isLoading,
   error,
   columnsClassName = 'grid-cols-2',
-  showDelete = false,
+  canDeleteImage,
 }: ImageLibraryGridProps) {
   if (isLoading) return (
     <div className="p-4 text-center text-yellow-500/50 animate-pulse text-xs uppercase tracking-widest">
@@ -64,8 +64,8 @@ export default function ImageLibraryGrid({
               #{idx + 1}
             </div>
 
-            {/* Delete only shown when showDelete=true */}
-            {showDelete && onDeleteImage && (
+            {/* Delete only shown when caller wants it & image is deletable */}
+            {onDeleteImage && canDeleteImage && canDeleteImage(img) && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();

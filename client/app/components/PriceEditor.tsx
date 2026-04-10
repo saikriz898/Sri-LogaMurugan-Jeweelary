@@ -18,6 +18,7 @@ interface PriceEditorProps {
   activeMetal: 'gold' | 'silver';
   setActiveMetal: (val: 'gold' | 'silver') => void;
   storedImages: string[];
+  sessionUploads: Set<string>;
   currentIndex: number;
   totalImages: number;
   isGenerating: boolean;
@@ -54,7 +55,7 @@ export default function PriceEditor({
   rates, setGoldPrice, setGold8Price, setSilverPrice,
   date, setDate,
   activeMetal, setActiveMetal,
-  storedImages, currentIndex, totalImages,
+  storedImages, sessionUploads, currentIndex, totalImages,
   isGenerating, isUploading, isDownloading, isSharing, isSyncing,
   isExportEnabled, isLoadingImages, imageError,
   notification,
@@ -249,19 +250,12 @@ export default function PriceEditor({
               <div className="flex items-center gap-2">
                 <button
                   onClick={onRefreshData}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/10 rounded-full transition-all"
+                  className="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/10 rounded-full transition-all"
                 >
                   <RefreshCw size={9} className="text-blue-400 shrink-0" />
-                  <span className="text-[8px] font-black uppercase tracking-widest text-blue-400">Refresh</span>
+                  <span className="text-[8px] font-black uppercase tracking-widest text-blue-400">Refresh Library</span>
                 </button>
-                <button
-                  onClick={onSyncDB} disabled={isSyncing}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#b8860b]/5 hover:bg-[#b8860b]/10 border border-[#b8860b]/10 rounded-full transition-all disabled:opacity-40"
-                >
-                  <RefreshCw size={9} className={`${isSyncing ? 'animate-spin' : ''} text-[#b8860b] shrink-0`} />
-                  <span className="text-[8px] font-black uppercase tracking-widest text-[#b8860b]">Sync DB</span>
-                </button>
-                <div className="ml-auto flex items-center gap-1.5 px-2.5 py-1.5 bg-[#b8860b]/5 rounded-full border border-[#b8860b]/10">
+                <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#b8860b]/5 rounded-full border border-[#b8860b]/10">
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${currentIndex === -1 ? 'bg-white/20' : 'bg-[#b8860b] animate-pulse'}`} />
                   <span className="text-[8px] font-bold text-[#b8860b]/80 uppercase tracking-widest">{cycleLabel}</span>
                 </div>
@@ -307,12 +301,14 @@ export default function PriceEditor({
                         <span className="text-[8px] font-black text-[#b8860b]">#{idx + 1}</span>
                       </div>
                       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); onDeleteImage(src); }}
-                          className="p-1.5 bg-red-500/20 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all backdrop-blur-md cursor-pointer"
-                        >
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                        </button>
+                        {sessionUploads.has(src) && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onDeleteImage(src); }}
+                            className="p-1.5 bg-red-500/20 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all backdrop-blur-md cursor-pointer"
+                          >
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                          </button>
+                        )}
                       </div>
                       {isActive && (
                         <div className="absolute inset-x-0 bottom-0 py-2 bg-[#b8860b]/90 text-center">

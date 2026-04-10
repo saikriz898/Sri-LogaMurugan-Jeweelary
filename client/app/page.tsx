@@ -13,7 +13,7 @@ export default function Home() {
     date, setDate,
     priceDropNote, setPriceDropNote,
     currentImage,
-    storedImages, currentIndex, totalImages,
+    storedImages, sessionUploads, currentIndex, totalImages,
     isLoadingImages, imageError,
     activeMetal, setActiveMetal,
     isConnected,
@@ -125,6 +125,7 @@ export default function Home() {
         onBackToGenerate={() => setIsExportEnabled(false)}
         isSyncing={isSyncing}
         images={storedImages}
+        sessionUploads={sessionUploads}
         onSelectImage={onSelectImage}
         onDeleteImage={handleDeleteImage}
         isLoadingImages={isLoadingImages}
@@ -167,6 +168,7 @@ export default function Home() {
             activeMetal={activeMetal}
             setActiveMetal={setActiveMetal}
             storedImages={storedImages}
+            sessionUploads={sessionUploads}
             currentIndex={currentIndex}
             totalImages={totalImages}
             isGenerating={isGenerating}
