@@ -15,6 +15,7 @@ interface MobileEditorProps {
   isGenerating: boolean;
   isDownloading: boolean;
   isSharing: boolean;
+  isExportEnabled: boolean;
   notification: { message: string, type: 'success' | 'error' | 'warning' } | null;
   priceDropNote: string;
   setPriceDropNote: (note: string) => void;
@@ -45,7 +46,7 @@ interface MobileEditorProps {
 
 export default function MobileEditor({
   currentImage, rates, setGoldPrice, setGold8Price, setSilverPrice,
-  isGenerating, isDownloading, isSharing, isSyncing,
+  isGenerating, isDownloading, isSharing, isExportEnabled, isSyncing,
   notification, priceDropNote, setPriceDropNote,
   metalMode, setMetalMode, date, setDate,
   posterRef, handleGenerate, handleDownload,
@@ -94,15 +95,15 @@ export default function MobileEditor({
               <div className="grid grid-cols-2 gap-4 w-full">
                  <button 
                     onClick={handleDownload} 
-                    disabled={isDownloading}
-                    className="btn-gold py-5 rounded-2xl flex items-center justify-center gap-2 text-[13px] shadow-2xl shadow-yellow-900/30 active:scale-95 transition-transform"
+                    disabled={isDownloading || !isExportEnabled}
+                    className="btn-gold py-5 rounded-2xl flex items-center justify-center gap-2 text-[13px] shadow-2xl shadow-yellow-900/30 active:scale-95 transition-transform disabled:opacity-40"
                   >
                     {isDownloading ? 'SAVING...' : '💾 DOWNLOAD'}
                   </button>
                   <button 
                     onClick={handleShare} 
-                    disabled={isSharing}
-                    className="bg-green-600/10 border-2 border-green-600/50 text-green-500 font-cinzel font-black py-5 rounded-2xl flex items-center justify-center gap-2 text-[13px] active:scale-95 transition-transform"
+                    disabled={isSharing || !isExportEnabled}
+                    className="bg-green-600/10 border-2 border-green-600/50 text-green-500 font-cinzel font-black py-5 rounded-2xl flex items-center justify-center gap-2 text-[13px] active:scale-95 transition-transform disabled:opacity-40"
                   >
                     {isSharing ? 'SENDING...' : '📲 WHATSAPP'}
                   </button>
@@ -123,7 +124,7 @@ export default function MobileEditor({
               onGenerate={handleGenerate} onDownload={handleDownload}
               onShare={handleShare} onReset={handleReset} onSyncDB={handleSyncDB}
               isGenerating={isGenerating} isDownloading={isDownloading}
-              isSharing={isSharing} isSyncing={isSyncing}
+              isSharing={isSharing} isExportEnabled={isExportEnabled} isSyncing={isSyncing}
               images={images}
               currentImage={currentImage}
               onSelectImage={onSelectImage}

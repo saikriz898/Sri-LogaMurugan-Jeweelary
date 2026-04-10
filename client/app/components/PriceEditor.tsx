@@ -25,6 +25,7 @@ interface PriceEditorProps {
   isSyncing: boolean;
   isDownloading: boolean;
   isSharing: boolean;
+  isExportEnabled: boolean;
   isConnected: boolean;
   isLoadingImages: boolean;
   imageError: string | null;
@@ -53,7 +54,7 @@ export default function PriceEditor({
   date, setDate,
   activeMetal, setActiveMetal,
   storedImages, currentIndex, totalImages,
-  isGenerating, isUploading, isSyncing, isDownloading, isSharing, isConnected,
+  isGenerating, isUploading, isSyncing, isDownloading, isSharing, isExportEnabled, isConnected,
   isLoadingImages, imageError,
   notification,
   currentPage, totalPages, imagesPerPage, goToPage, nextPage, prevPage,
@@ -281,7 +282,8 @@ export default function PriceEditor({
                 </div>
               ) : (
                 storedImages.map((src, idx) => {
-                  const isActive = totalImages > 0 && safeIndex === idx;
+                  const globalIdx = (currentPage - 1) * imagesPerPage + idx;
+                  const isActive = totalImages > 0 && safeIndex === globalIdx;
                   return (
                     <div
                       key={`${src}-${idx}`}
@@ -382,14 +384,14 @@ export default function PriceEditor({
             </button>
             <div className="grid grid-cols-2 gap-3">
               <button
-                onClick={onExport} disabled={isDownloading || isGenerating}
+                onClick={onExport} disabled={isDownloading || isGenerating || !isExportEnabled}
                 className="h-12 bg-white/5 border border-white/10 text-[#f3e5ab] text-[9px] font-black uppercase tracking-widest rounded-[18px] flex items-center justify-center gap-2 hover:bg-white/10 transition-all disabled:opacity-40"
               >
                 {isDownloading ? <Loader2 className="animate-spin text-[#b8860b]" size={14} /> : <Download size={14} className="text-[#b8860b]" />}
                 {isDownloading ? 'Saving...' : 'Export'}
               </button>
               <button
-                onClick={onShare} disabled={isSharing || isGenerating}
+                onClick={onShare} disabled={isSharing || isGenerating || !isExportEnabled}
                 className="h-12 bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] text-[9px] font-black uppercase tracking-widest rounded-[18px] flex items-center justify-center gap-2 hover:bg-[#25D366]/20 transition-all disabled:opacity-40"
               >
                 {isSharing ? <Loader2 className="animate-spin text-[#25D366]" size={14} /> : <MessageSquare size={14} />}

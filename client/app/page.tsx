@@ -25,6 +25,7 @@ export default function Home() {
     isSharing, setIsSharing,
     isUploadingPhotos, isSyncing,
     notification,
+    isExportEnabled, setIsExportEnabled,
     handleGenerate, handleSyncDB, handleRefreshData,
     onUploadPhotos, onSelectImage,
     handleDeleteImage, handleReset,
@@ -42,7 +43,7 @@ export default function Home() {
   }, []);
 
   const handleDownload = async () => {
-    if (!posterRef.current) return;
+    if (!posterRef.current || !isExportEnabled) return;
     setIsDownloading(true);
     try {
       const dataUrl = await toJpeg(posterRef.current, { 
@@ -54,7 +55,8 @@ export default function Home() {
       link.download = `Sri_Lokamurugan_${date.replace(/ /g, '_')}.jpg`;
       link.href = dataUrl;
       link.click();
-      showToast("Poster Saved to Gallery", "success");
+      setIsExportEnabled(false); // Only one export per generate
+      showToast("Saved! Generate New Poster.", "success");
     } catch (err) {
       console.error("Export failed", err);
       showToast("Download Failed", "error");
@@ -85,6 +87,8 @@ export default function Home() {
         const shareText = encodeURIComponent(`Daily Price Update: Gold 1G: ₹${rates.gold1g}`);
         window.open(`https://wa.me/?text=${shareText}`, '_blank');
       }
+      setIsExportEnabled(false); // Disable after sharing
+      showToast("Shared! Generate New Poster.", "success");
     } catch (err) {
       console.error("Share failed", err);
       showToast("Share Failed", "error");
@@ -104,6 +108,7 @@ export default function Home() {
         isGenerating={isGenerating}
         isDownloading={isDownloading}
         isSharing={isSharing}
+        isExportEnabled={isExportEnabled}
         notification={notification}
         priceDropNote={priceDropNote}
         setPriceDropNote={setPriceDropNote}
@@ -168,6 +173,7 @@ export default function Home() {
             isSyncing={isSyncing}
             isDownloading={isDownloading}
             isSharing={isSharing}
+            isExportEnabled={isExportEnabled}
             isConnected={isConnected}
             isLoadingImages={isLoadingImages}
             imageError={imageError}

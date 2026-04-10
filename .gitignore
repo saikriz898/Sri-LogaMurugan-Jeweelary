@@ -21,3 +21,4 @@ server/uploads/
 npm-debug.log*
 yarn-debug.log*
 *.tsbuildinfo
+PROJECT_REPORT.md

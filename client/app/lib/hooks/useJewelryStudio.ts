@@ -26,6 +26,7 @@ export function useJewelryStudio() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
+  const [isExportEnabled, setIsExportEnabled] = useState(false);
 
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'warning' = 'success') => {
     setNotification({ message, type });
@@ -173,18 +174,40 @@ export function useJewelryStudio() {
   }, [refreshAssets, showToast]);
 
 
-  const setGoldPrice = (val: string) => setRates(prev => ({
-    ...prev, gold1g: val
-  }));
+  const setGoldPrice = (val: string) => {
+    const numVal = parseFloat(val.replace(/,/g, ''));
+    const gold8gVal = !isNaN(numVal) ? (numVal * 8).toString() : "";
+    setRates(prev => ({
+      ...prev, 
+      gold1g: val,
+      gold8g: gold8gVal
+    }));
+  };
   const setGold8Price = (val: string) => setRates(prev => ({ ...prev, gold8g: val }));
   const setSilverPrice = (val: string) => setRates(prev => ({ ...prev, silver1g: val }));
 
   const handleGenerate = async () => {
     if (!rates.gold1g || parseFloat(rates.gold1g) <= 0) return showToast("Enter Gold Price", 'warning');
+    if (storedImages.length === 0) return showToast("Upload an artwork first", 'warning');
     setIsGenerating(true);
     const total = totalImages || storedImages.length;
     const nextIdx = total === 0 ? 0 : currentIndex === -1 ? 0 : (currentIndex + 1) % total;
+
+    // Auto-Pagination Logic
+    const nextPageNeeded = Math.floor(nextIdx / imagesPerPage) + 1;
+    if (nextPageNeeded !== currentPageRef.current && nextPageNeeded <= totalPages) {
+      currentPageRef.current = nextPageNeeded;
+      setCurrentPage(nextPageNeeded);
+      await refreshAssets(nextPageNeeded);
+    } else if (nextIdx === 0 && totalPages > 1 && currentPageRef.current !== 1) {
+      // Loop back to page 1 seamlessly
+      currentPageRef.current = 1;
+      setCurrentPage(1);
+      await refreshAssets(1);
+    }
+
     setCurrentIndex(nextIdx);
+    setIsExportEnabled(true);
     setIsGenerating(false);
     showToast("Poster Generated", 'success');
   };
@@ -228,8 +251,9 @@ export function useJewelryStudio() {
     }
   };
 
-  const onSelectImage = (index: number) => {
-    setCurrentIndex(index);
+  const onSelectImage = (localIndex: number) => {
+    const globalIdx = (currentPageRef.current - 1) * imagesPerPage + localIndex;
+    setCurrentIndex(globalIdx);
   };
 
   const handleDeleteImage = async (src: string) => {
@@ -290,7 +314,7 @@ export function useJewelryStudio() {
 
   // Derive currentImage — always in sync, no stale state
   const currentImage = storedImages.length > 0 && currentIndex >= 0
-    ? storedImages[currentIndex % storedImages.length]
+    ? storedImages[currentIndex % imagesPerPage] // Must use imagesPerPage to extract local index from global.
     : undefined;
 
   return {
@@ -308,6 +332,7 @@ export function useJewelryStudio() {
     uploadProgress,
     isGenerating, isDownloading, setIsDownloading,
     isSharing, setIsSharing,
+    isExportEnabled, setIsExportEnabled,
     isUploadingPhotos, isSyncing,
     notification,
     handleGenerate, handleSyncDB, handleRefreshData,

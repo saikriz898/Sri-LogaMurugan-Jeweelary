@@ -31,6 +31,7 @@ interface MobileControlPanelProps {
   isGenerating: boolean;
   isDownloading: boolean;
   isSharing: boolean;
+  isExportEnabled: boolean;
   images: string[];
   currentImage?: string;
   currentIndex: number;
@@ -49,7 +50,7 @@ interface MobileControlPanelProps {
 export default function MobileControlPanel({
   rates, setGoldPrice, setGold8Price, setSilverPrice, date, setDate, priceDropNote, setPriceDropNote,
   onGenerate, onDownload, onShare, onReset, onSyncDB,
-  isGenerating, isDownloading, isSharing, isSyncing,
+  isGenerating, isDownloading, isSharing, isSyncing, isExportEnabled,
   images, currentImage, currentIndex, totalImages,
   currentPage, totalPages, goToPage,
   onSelectImage, onDeleteImage, isLoadingImages, imageError,
@@ -87,12 +88,12 @@ export default function MobileControlPanel({
           </button>
 
           <div className="grid grid-cols-2 gap-3">
-            <button onClick={onDownload} disabled={isDownloading}
+            <button onClick={onDownload} disabled={isDownloading || !isExportEnabled}
               className="btn-ghost-gold py-3.5 rounded-xl flex items-center justify-center gap-2 text-sm active:scale-[0.98] transition-transform disabled:opacity-50"
             >
               {isDownloading ? <span className="inline-block w-4 h-4 border-2 border-yellow-600/30 border-t-yellow-400 rounded-full animate-spin" /> : <>💾 Save</>}
             </button>
-            <button onClick={onShare} disabled={isSharing}
+            <button onClick={onShare} disabled={isSharing || !isExportEnabled}
               className="py-3.5 rounded-xl flex items-center justify-center gap-2 text-sm font-bold tracking-wider border border-green-600/50 text-green-500 bg-green-500/5 active:scale-[0.98] transition-transform disabled:opacity-50"
             >
               {isSharing ? <span className="inline-block w-4 h-4 border-2 border-green-800 border-t-green-400 rounded-full animate-spin" /> : <>📲 WhatsApp</>}
