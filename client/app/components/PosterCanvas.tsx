@@ -38,11 +38,12 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterCanvasProps>(function Post
       <div className="absolute top-0 left-0 right-0 h-[72%] z-0 overflow-hidden">
         {imageUrl ? (
           <img
+            key={imageUrl}
             src={imageUrl}
             className="w-full h-full object-cover object-top animate-in fade-in scale-in-95 duration-1000"
             alt="Jewellery"
             loading="eager"
-            decoding="sync"
+            decoding="async"
             onError={(e) => {
               const img = e.currentTarget;
               img.src = '/Main-logo.png';
