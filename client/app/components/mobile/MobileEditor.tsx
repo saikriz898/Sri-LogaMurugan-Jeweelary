@@ -27,6 +27,7 @@ interface MobileEditorProps {
   handleGenerate: () => void;
   handleDownload: () => void;
   handleShare: () => void;
+  onBackToGenerate: () => void;
   handleReset: () => void;
   handleSyncDB: () => void;
   isSyncing: boolean;
@@ -50,7 +51,7 @@ export default function MobileEditor({
   notification, priceDropNote, setPriceDropNote,
   metalMode, setMetalMode, date, setDate,
   posterRef, handleGenerate, handleDownload,
-  handleShare, handleReset, handleSyncDB,
+  handleShare, onBackToGenerate, handleReset, handleSyncDB,
   images, onSelectImage, onDeleteImage, isLoadingImages, imageError,
   onUploadPhotos, isUploadingPhotos,
   currentIndex, totalImages, currentPage, totalPages, goToPage,
@@ -84,30 +85,54 @@ export default function MobileEditor({
             </div>
 
             <div className="flex flex-col items-center w-full max-w-[405px] mt-2 mb-12 relative z-10 px-2">
-              <button
-                type="button"
-                onClick={() => setActiveTab('edit')}
-                className="mb-8 text-[12px] font-cinzel font-black tracking-[0.3em] uppercase text-yellow-400 bg-yellow-400/10 border border-yellow-400/30 px-8 py-3 rounded-full active:scale-95 transition-all shadow-[0_0_20px_rgba(184,134,11,0.1)] hover:bg-yellow-400/20"
-              >
-                ← Back to Editor
-              </button>
-
-              <div className="grid grid-cols-2 gap-4 w-full">
-                 <button 
-                    onClick={handleDownload} 
-                    disabled={isDownloading || !isExportEnabled}
-                    className="btn-gold py-5 rounded-2xl flex items-center justify-center gap-2 text-[13px] shadow-2xl shadow-yellow-900/30 active:scale-95 transition-transform disabled:opacity-40"
+              {!isExportEnabled ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleGenerate}
+                    disabled={isGenerating}
+                    className="mb-8 w-full bg-gradient-to-br from-[#b8860b] via-[#d4af37] to-[#7a5a07] text-black font-cinzel font-black py-5 rounded-2xl flex items-center justify-center gap-2 text-[13px] shadow-2xl shadow-yellow-900/30 active:scale-95 transition-transform disabled:opacity-40"
                   >
-                    {isDownloading ? 'SAVING...' : '💾 DOWNLOAD'}
+                    {isGenerating ? 'GENERATING...' : '✨ GENERATE MASTERPIECE'}
                   </button>
-                  <button 
-                    onClick={handleShare} 
-                    disabled={isSharing || !isExportEnabled}
-                    className="bg-green-600/10 border-2 border-green-600/50 text-green-500 font-cinzel font-black py-5 rounded-2xl flex items-center justify-center gap-2 text-[13px] active:scale-95 transition-transform disabled:opacity-40"
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('edit')}
+                    className="text-[12px] font-cinzel font-black tracking-[0.3em] uppercase text-yellow-400/50 bg-transparent py-3"
                   >
-                    {isSharing ? 'SENDING...' : '📲 WHATSAPP'}
+                    Return to Settings
                   </button>
-              </div>
+                </>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-4 w-full mb-6">
+                     <button 
+                        onClick={handleDownload} 
+                        disabled={isDownloading}
+                        className="btn-gold py-5 rounded-2xl flex items-center justify-center gap-2 text-[13px] shadow-2xl shadow-yellow-900/30 active:scale-95 transition-transform disabled:opacity-40"
+                      >
+                        {isDownloading ? 'SAVING...' : '💾 DOWNLOAD'}
+                      </button>
+                      <button 
+                        onClick={handleShare} 
+                        disabled={isSharing}
+                        className="bg-green-600/10 border-2 border-green-600/50 text-green-500 font-cinzel font-black py-5 rounded-2xl flex items-center justify-center gap-2 text-[13px] active:scale-95 transition-transform disabled:opacity-40"
+                      >
+                        {isSharing ? 'SENDING...' : '📲 WHATSAPP'}
+                      </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onBackToGenerate();
+                      setActiveTab('edit');
+                    }}
+                    className="w-full text-[12px] font-cinzel font-black tracking-[0.3em] uppercase text-yellow-500/70 bg-yellow-400/5 border border-yellow-400/20 px-8 py-3 rounded-xl active:scale-95 transition-all shadow-[0_0_20px_rgba(184,134,11,0.1)] hover:bg-yellow-400/10"
+                  >
+                    ← Back to Generation
+                  </button>
+                </>
+              )}
               <p className="mt-8 text-[11px] font-playfair italic text-yellow-900/50 text-center uppercase tracking-[0.3em] opacity-60">Optimized for 9:16 High-Res Status</p>
             </div>
           </div>
@@ -122,7 +147,7 @@ export default function MobileEditor({
               date={date} setDate={setDate}
               priceDropNote={priceDropNote} setPriceDropNote={setPriceDropNote}
               onGenerate={handleGenerate} onDownload={handleDownload}
-              onShare={handleShare} onReset={handleReset} onSyncDB={handleSyncDB}
+              onShare={handleShare} onBackToGenerate={onBackToGenerate} onReset={handleReset} onSyncDB={handleSyncDB}
               isGenerating={isGenerating} isDownloading={isDownloading}
               isSharing={isSharing} isExportEnabled={isExportEnabled} isSyncing={isSyncing}
               images={images}

@@ -41,6 +41,7 @@ interface PriceEditorProps {
   uploadProgress: { completed: number; total: number; message: string } | null;
   onGenerate: () => void;
   onExport: () => void;
+  onBackToGenerate: () => void;
   onShare: () => void;
   onSyncDB: () => void;
   onRefreshData: () => void;
@@ -59,7 +60,7 @@ export default function PriceEditor({
   notification,
   currentPage, totalPages, imagesPerPage, goToPage, nextPage, prevPage,
   uploadProgress,
-  onGenerate, onExport, onShare, onSyncDB, onRefreshData,
+  onGenerate, onExport, onShare, onBackToGenerate, onSyncDB, onRefreshData,
   onSelectImage, onDeleteImage, onUploadFiles,
 }: PriceEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -371,33 +372,44 @@ export default function PriceEditor({
         {/* Action Buttons */}
         <div className="absolute bottom-0 left-0 w-full px-8 pb-8 pt-4 bg-gradient-to-t from-[#050402] via-[#050402]/90 to-transparent z-30">
           <div className="space-y-3">
-            <button
-              disabled={isGenerating}
-              onClick={onGenerate}
-              className="group relative w-full h-14 bg-gradient-to-br from-[#b8860b] via-[#d4af37] to-[#7a5a07] rounded-[18px] flex items-center justify-center gap-3 active:scale-[0.98] transition-all overflow-hidden disabled:opacity-60"
-            >
-              <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 skew-x-[-45deg]" />
-              {isGenerating ? <Loader2 className="animate-spin text-black" size={18} /> : <Sparkles className="text-black" size={18} />}
-              <span className="text-black font-black uppercase tracking-[0.2em] text-[10px]">
-                {isGenerating ? 'Generating...' : 'Generate Masterpiece'}
-              </span>
-            </button>
-            <div className="grid grid-cols-2 gap-3">
+            {!isExportEnabled ? (
               <button
-                onClick={onExport} disabled={isDownloading || isGenerating || !isExportEnabled}
-                className="h-12 bg-white/5 border border-white/10 text-[#f3e5ab] text-[9px] font-black uppercase tracking-widest rounded-[18px] flex items-center justify-center gap-2 hover:bg-white/10 transition-all disabled:opacity-40"
+                disabled={isGenerating}
+                onClick={onGenerate}
+                className="group relative w-full h-14 bg-gradient-to-br from-[#b8860b] via-[#d4af37] to-[#7a5a07] rounded-[18px] flex items-center justify-center gap-3 active:scale-[0.98] transition-all overflow-hidden disabled:opacity-60"
               >
-                {isDownloading ? <Loader2 className="animate-spin text-[#b8860b]" size={14} /> : <Download size={14} className="text-[#b8860b]" />}
-                {isDownloading ? 'Saving...' : 'Export'}
+                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 skew-x-[-45deg]" />
+                {isGenerating ? <Loader2 className="animate-spin text-black" size={18} /> : <Sparkles className="text-black" size={18} />}
+                <span className="text-black font-black uppercase tracking-[0.2em] text-[10px]">
+                  {isGenerating ? 'Generating...' : 'Generate Masterpiece'}
+                </span>
               </button>
-              <button
-                onClick={onShare} disabled={isSharing || isGenerating || !isExportEnabled}
-                className="h-12 bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] text-[9px] font-black uppercase tracking-widest rounded-[18px] flex items-center justify-center gap-2 hover:bg-[#25D366]/20 transition-all disabled:opacity-40"
-              >
-                {isSharing ? <Loader2 className="animate-spin text-[#25D366]" size={14} /> : <MessageSquare size={14} />}
-                {isSharing ? 'Sending...' : 'Share'}
-              </button>
-            </div>
+            ) : (
+              <div className="space-y-3 animate-in slide-in-from-bottom-2 fade-in duration-300">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={onExport} disabled={isDownloading || isGenerating}
+                    className="h-12 bg-white/5 border border-white/10 text-[#f3e5ab] text-[9px] font-black uppercase tracking-widest rounded-[18px] flex items-center justify-center gap-2 hover:bg-white/10 transition-all disabled:opacity-40"
+                  >
+                    {isDownloading ? <Loader2 className="animate-spin text-[#b8860b]" size={14} /> : <Download size={14} className="text-[#b8860b]" />}
+                    {isDownloading ? 'Saving...' : 'Export Poster'}
+                  </button>
+                  <button
+                    onClick={onShare} disabled={isSharing || isGenerating}
+                    className="h-12 bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] text-[9px] font-black uppercase tracking-widest rounded-[18px] flex items-center justify-center gap-2 hover:bg-[#25D366]/20 transition-all disabled:opacity-40"
+                  >
+                    {isSharing ? <Loader2 className="animate-spin text-[#25D366]" size={14} /> : <MessageSquare size={14} />}
+                    {isSharing ? 'Sending...' : 'WhatsApp Share'}
+                  </button>
+                </div>
+                <button
+                  onClick={onBackToGenerate}
+                  className="w-full h-10 border border-[#b8860b]/20 text-[#b8860b]/70 hover:text-black hover:bg-[#b8860b] text-[9px] font-black uppercase tracking-widest rounded-xl transition-all"
+                >
+                  ← Back to Generate
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

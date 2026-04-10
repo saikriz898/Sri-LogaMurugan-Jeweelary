@@ -122,6 +122,7 @@ export default function Home() {
         handleShare={handleShare}
         handleReset={handleReset}
         handleSyncDB={handleSyncDB}
+        onBackToGenerate={() => setIsExportEnabled(false)}
         isSyncing={isSyncing}
         images={storedImages}
         onSelectImage={onSelectImage}
@@ -188,6 +189,7 @@ export default function Home() {
             onGenerate={handleGenerate}
             onExport={handleDownload}
             onShare={handleShare}
+            onBackToGenerate={() => setIsExportEnabled(false)}
             onSyncDB={handleSyncDB}
             onRefreshData={handleRefreshData}
             onSelectImage={onSelectImage}

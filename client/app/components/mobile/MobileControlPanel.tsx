@@ -32,6 +32,7 @@ interface MobileControlPanelProps {
   isDownloading: boolean;
   isSharing: boolean;
   isExportEnabled: boolean;
+  onBackToGenerate: () => void;
   images: string[];
   currentImage?: string;
   currentIndex: number;
@@ -49,7 +50,7 @@ interface MobileControlPanelProps {
 
 export default function MobileControlPanel({
   rates, setGoldPrice, setGold8Price, setSilverPrice, date, setDate, priceDropNote, setPriceDropNote,
-  onGenerate, onDownload, onShare, onReset, onSyncDB,
+  onGenerate, onDownload, onShare, onReset, onSyncDB, onBackToGenerate,
   isGenerating, isDownloading, isSharing, isSyncing, isExportEnabled,
   images, currentImage, currentIndex, totalImages,
   currentPage, totalPages, goToPage,
@@ -78,27 +79,37 @@ export default function MobileControlPanel({
       <div className="flex flex-col gap-4">
         <SectionLabel label="Poster Actions" />
         <div className="flex flex-col gap-3 px-1">
-          <button
-            onClick={onGenerate} disabled={isGenerating}
-            className="btn-gold w-full py-4 rounded-xl flex items-center justify-center gap-3 text-base shadow-xl shadow-yellow-900/10 active:scale-[0.98] transition-transform disabled:opacity-50"
-          >
-            {isGenerating
-              ? <><span className="inline-block w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />Processing...</>
-              : <>✨ Generate New Poster</>}
-          </button>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={onDownload} disabled={isDownloading || !isExportEnabled}
-              className="btn-ghost-gold py-3.5 rounded-xl flex items-center justify-center gap-2 text-sm active:scale-[0.98] transition-transform disabled:opacity-50"
+          {!isExportEnabled ? (
+            <button
+              onClick={onGenerate} disabled={isGenerating}
+              className="btn-gold w-full py-4 rounded-xl flex items-center justify-center gap-3 text-base shadow-xl shadow-yellow-900/10 active:scale-[0.98] transition-transform disabled:opacity-50"
             >
-              {isDownloading ? <span className="inline-block w-4 h-4 border-2 border-yellow-600/30 border-t-yellow-400 rounded-full animate-spin" /> : <>💾 Save</>}
+              {isGenerating
+                ? <><span className="inline-block w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />Processing...</>
+                : <>✨ Generate New Poster</>}
             </button>
-            <button onClick={onShare} disabled={isSharing || !isExportEnabled}
-              className="py-3.5 rounded-xl flex items-center justify-center gap-2 text-sm font-bold tracking-wider border border-green-600/50 text-green-500 bg-green-500/5 active:scale-[0.98] transition-transform disabled:opacity-50"
-            >
-              {isSharing ? <span className="inline-block w-4 h-4 border-2 border-green-800 border-t-green-400 rounded-full animate-spin" /> : <>📲 WhatsApp</>}
-            </button>
-          </div>
+          ) : (
+            <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="grid grid-cols-2 gap-3">
+                <button onClick={onDownload} disabled={isDownloading}
+                  className="btn-ghost-gold py-3.5 rounded-xl flex items-center justify-center gap-2 text-sm active:scale-[0.98] transition-transform disabled:opacity-50"
+                >
+                  {isDownloading ? <span className="inline-block w-4 h-4 border-2 border-yellow-600/30 border-t-yellow-400 rounded-full animate-spin" /> : <>💾 Save</>}
+                </button>
+                <button onClick={onShare} disabled={isSharing}
+                  className="py-3.5 rounded-xl flex items-center justify-center gap-2 text-sm font-bold tracking-wider border border-green-600/50 text-green-500 bg-green-500/5 active:scale-[0.98] transition-transform disabled:opacity-50"
+                >
+                  {isSharing ? <span className="inline-block w-4 h-4 border-2 border-green-800 border-t-green-400 rounded-full animate-spin" /> : <>📲 WhatsApp</>}
+                </button>
+              </div>
+              <button
+                onClick={onBackToGenerate}
+                className="w-full py-3 border border-yellow-500/20 text-yellow-500/60 hover:text-yellow-400 hover:bg-yellow-500/10 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
+              >
+                ← Back to Generate
+              </button>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-3">
             <button onClick={onSyncDB} disabled={isSyncing}
