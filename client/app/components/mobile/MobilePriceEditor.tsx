@@ -31,7 +31,7 @@ interface MobilePriceEditorProps {
 }
 
 export default function MobilePriceEditor({
-  rates, setGoldPrice, setGold8Price, setSilverPrice, date, setDate, priceDropNote, setPriceDropNote
+  rates, setGoldPrice, setGold8Price, setSilverPrice, date, setDate
 }: MobilePriceEditorProps) {
   return (
     <div className="flex flex-col gap-6">
@@ -69,12 +69,13 @@ export default function MobilePriceEditor({
           </FieldRow>
         </div>
 
-        <FieldRow label="Price Note (Tamil)">
-          <textarea 
-            value={priceDropNote} 
-            onChange={(e) => setPriceDropNote(e.target.value)}
-            className="input-gold w-full rounded-xl px-4 py-3.5 text-sm resize-none h-24"
-            placeholder="தங்கத்தின் விலை கிராமுக்கு –33" 
+        <FieldRow label="1G SILVER ₹">
+          <input 
+            type="text" 
+            value={rates.silver1g} 
+            onChange={(e) => setSilverPrice(e.target.value)}
+            className="input-gold w-full rounded-xl px-4 py-3.5 text-base" 
+            placeholder="90" 
           />
         </FieldRow>
       </div>

@@ -51,7 +51,6 @@ interface PriceEditorProps {
 export default function PriceEditor({
   rates, setGoldPrice, setGold8Price, setSilverPrice,
   date, setDate,
-  priceDropNote, setPriceDropNote,
   activeMetal, setActiveMetal,
   storedImages, currentIndex, totalImages,
   isGenerating, isUploading, isSyncing, isDownloading, isSharing, isConnected,
@@ -181,20 +180,7 @@ export default function PriceEditor({
             </div>
           </section>
 
-          {/* Story Copy */}
-          <section className="space-y-6">
-            <div className="flex items-center gap-3 px-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#b8860b]" />
-              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Story Copy</h2>
-            </div>
-            <div className="bg-white/5 border border-white/5 rounded-[24px] p-5 backdrop-blur-md">
-              <textarea
-                value={priceDropNote} onChange={(e) => setPriceDropNote(e.target.value)}
-                className="w-full bg-white/[0.02] border border-white/5 px-4 py-4 text-[#f3e5ab]/80 text-[12px] leading-relaxed min-h-[100px] rounded-xl focus:outline-none focus:border-[#b8860b]/30 focus:bg-white/[0.04] transition-all resize-none font-medium"
-                placeholder="Write Tamil price drop note..."
-              />
-            </div>
-          </section>
+
 
           {/* Upload */}
           <section className="space-y-6">
