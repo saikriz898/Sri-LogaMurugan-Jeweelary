@@ -38,11 +38,14 @@ export function useJewelryStudio() {
       const res = await fetch(`${API_URL}/api/image-library?page=${page}&limit=20`);
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       const data = await res.json();
+      const apiBase = API_URL.replace(/\/$/, '');
       const imgs = (data.images || []).map((img: { compressedUrl?: string; imageUrl?: string }) => {
-        const url = img.compressedUrl || img.imageUrl;
-        // If already absolute, use as-is; otherwise proxy via Next.js rewrite
-        return url && url.startsWith('http') ? url : url || '';
-      });
+        const url = img.compressedUrl || img.imageUrl || '';
+        if (!url) return '';
+        if (url.startsWith('http')) return url;
+        if (url.startsWith('/')) return `${apiBase}${url}`;
+        return `${apiBase}/${url}`;
+      }).filter((url: string) => Boolean(url));
       setStoredImages(imgs);
       setTotalImages(data.pagination?.total || imgs.length);
       setTotalPages(data.pagination?.pages || 1);
@@ -52,6 +55,9 @@ export function useJewelryStudio() {
       setImageError(null);
     } catch (err: unknown) {
       console.error("Failed to load library:", err);
+      setStoredImages([]);
+      setTotalImages(0);
+      setTotalPages(1);
       setImageError(`Library offline: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoadingImages(false);
@@ -247,6 +253,16 @@ export function useJewelryStudio() {
     }
   };
 
+  useEffect(() => {
+    if (storedImages.length === 0 && currentIndex !== -1) {
+      setCurrentIndex(-1);
+      return;
+    }
+    if (storedImages.length > 0 && currentIndex >= storedImages.length) {
+      setCurrentIndex(storedImages.length - 1);
+    }
+  }, [storedImages.length, currentIndex]);
+
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       currentPageRef.current = page;
@@ -273,7 +289,7 @@ export function useJewelryStudio() {
   const handleReset = () => { setCurrentIndex(-1); showToast('Selection reset', 'success'); };
 
   // Derive currentImage — always in sync, no stale state
-  const currentImage = totalImages > 0 && currentIndex >= 0 && storedImages.length > 0
+  const currentImage = storedImages.length > 0 && currentIndex >= 0
     ? storedImages[currentIndex % storedImages.length]
     : undefined;
 

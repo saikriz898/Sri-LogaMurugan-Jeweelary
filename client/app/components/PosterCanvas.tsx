@@ -43,6 +43,11 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterCanvasProps>(function Post
             alt="Jewellery"
             loading="eager"
             decoding="sync"
+            onError={(e) => {
+              const img = e.currentTarget;
+              img.src = '/Main-logo.png';
+              img.className = 'w-full h-full object-cover opacity-50';
+            }}
           />
         ) : (
           <div className="w-full h-full bg-[radial-gradient(circle_at_50%_40%,_#1c1408_0%,_#050402_100%)] flex items-center justify-center">

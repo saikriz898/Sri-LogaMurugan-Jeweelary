@@ -26,6 +26,8 @@ interface PriceEditorProps {
   isDownloading: boolean;
   isSharing: boolean;
   isConnected: boolean;
+  isLoadingImages: boolean;
+  imageError: string | null;
   notification: { message: string; type: 'success' | 'error' | 'warning' } | null;
   // Pagination
   currentPage: number;
@@ -53,6 +55,7 @@ export default function PriceEditor({
   activeMetal, setActiveMetal,
   storedImages, currentIndex, totalImages,
   isGenerating, isUploading, isSyncing, isDownloading, isSharing, isConnected,
+  isLoadingImages, imageError,
   notification,
   currentPage, totalPages, imagesPerPage, goToPage, nextPage, prevPage,
   uploadProgress,
@@ -61,11 +64,12 @@ export default function PriceEditor({
 }: PriceEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const safeIndex = currentIndex >= 0 ? currentIndex % totalImages : -1;
   const cycleLabel = totalImages === 0
     ? 'No Images'
-    : currentIndex === -1
+    : safeIndex === -1
     ? `0 / ${totalImages}`
-    : `${(currentIndex % totalImages) + 1} / ${totalImages}`;
+    : `${safeIndex + 1} / ${totalImages}`;
 
   return (
     <>
@@ -150,8 +154,8 @@ export default function PriceEditor({
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] font-bold uppercase tracking-widest text-white/20 pl-1">Gold 8G</label>
+                <div className="space-y-2 group">
+                  <label className="text-[9px] font-bold uppercase tracking-widest text-white/20 group-focus-within:text-[#b8860b] pl-1">Gold 8G</label>
                   <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#b8860b] font-bold text-[10px]">₹</span>
                   <input
@@ -231,13 +235,13 @@ export default function PriceEditor({
                     {uploadProgress.completed}/{uploadProgress.total} Images
                   </span>
                   <span className="text-[8px] text-green-300/60">
-                    {Math.round((uploadProgress.completed / uploadProgress.total) * 100)}%
+                    {uploadProgress.total > 0 ? Math.round((uploadProgress.completed / uploadProgress.total) * 100) : 0}%
                   </span>
                 </div>
                 <div className="w-full bg-green-500/10 rounded-full h-2 mb-2">
                   <div
                     className="bg-green-400 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${(uploadProgress.completed / uploadProgress.total) * 100}%` }}
+                    style={{ width: `${uploadProgress.total > 0 ? (uploadProgress.completed / uploadProgress.total) * 100 : 0}%` }}
                   />
                 </div>
                 <p className="text-[9px] text-green-300/80 font-medium">{uploadProgress.message}</p>
@@ -277,35 +281,60 @@ export default function PriceEditor({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              {storedImages.map((src, idx) => {
-                const isActive = totalImages > 0 && (currentIndex % totalImages) === idx;
-                return (
-                  <div
-                    key={src}
-                    onClick={() => onSelectImage(idx)}
-                    className={`aspect-[4/5] rounded-[20px] overflow-hidden bg-white/5 border transition-all duration-500 relative group cursor-pointer ${isActive ? 'border-[#b8860b] ring-2 ring-[#b8860b]/20 scale-95' : 'border-white/5 opacity-40 hover:opacity-100 hover:border-white/20'}`}
-                  >
-                    <img src={src} className="w-full h-full object-cover" alt="product" />
-                    <div className="absolute top-2 left-2 px-2 py-1 bg-black/60 backdrop-blur-md rounded-lg border border-white/10">
-                      <span className="text-[8px] font-black text-[#b8860b]">#{idx + 1}</span>
-                    </div>
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onDeleteImage(src); }}
-                        className="p-1.5 bg-red-500/20 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all backdrop-blur-md cursor-pointer"
-                      >
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                      </button>
-                    </div>
-                    {isActive && (
-                      <div className="absolute inset-x-0 bottom-0 py-2 bg-[#b8860b]/90 text-center">
-                        <span className="text-[7px] font-black uppercase tracking-[0.2em] text-black">Active in Studio</span>
+              {isLoadingImages ? (
+                Array.from({ length: 4 }).map((_, idx) => (
+                  <div key={idx} className="aspect-[4/5] rounded-[20px] overflow-hidden bg-white/5 border border-white/10 animate-pulse" />
+                ))
+              ) : imageError ? (
+                <div className="col-span-2 rounded-[24px] border border-red-500/20 bg-red-500/10 p-6 text-center text-sm text-red-200">
+                  {imageError}
+                </div>
+              ) : storedImages.length === 0 ? (
+                <div className="col-span-2 rounded-[24px] border border-white/10 bg-white/5 p-6 text-center text-sm text-white/70">
+                  No artwork is available. Upload photos or sync the gallery to start.
+                </div>
+              ) : (
+                storedImages.map((src, idx) => {
+                  const isActive = totalImages > 0 && safeIndex === idx;
+                  return (
+                    <div
+                      key={`${src}-${idx}`}
+                      onClick={() => onSelectImage(idx)}
+                      className={`aspect-[4/5] rounded-[20px] overflow-hidden bg-white/5 border transition-all duration-500 relative group cursor-pointer ${isActive ? 'border-[#b8860b] ring-2 ring-[#b8860b]/20 scale-95' : 'border-white/5 opacity-40 hover:opacity-100 hover:border-white/20'}`}
+                    >
+                      <img
+                        src={src}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                        alt="product"
+                        onError={(e) => {
+                          const img = e.currentTarget;
+                          img.src = '/Main-logo.png';
+                          img.className = 'w-full h-full object-cover opacity-50';
+                        }}
+                      />
+                      <div className="absolute top-2 left-2 px-2 py-1 bg-black/60 backdrop-blur-md rounded-lg border border-white/10">
+                        <span className="text-[8px] font-black text-[#b8860b]">#{idx + 1}</span>
                       </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/20 pointer-events-none" />
-                  </div>
-                );
-              })}
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onDeleteImage(src); }}
+                          className="p-1.5 bg-red-500/20 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all backdrop-blur-md cursor-pointer"
+                        >
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                        </button>
+                      </div>
+                      {isActive && (
+                        <div className="absolute inset-x-0 bottom-0 py-2 bg-[#b8860b]/90 text-center">
+                          <span className="text-[7px] font-black uppercase tracking-[0.2em] text-black">Active in Studio</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+                    </div>
+                  );
+                })
+              )}
             </div>
 
             {/* Pagination Controls */}

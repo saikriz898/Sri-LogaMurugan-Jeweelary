@@ -169,6 +169,8 @@ export default function Home() {
             isDownloading={isDownloading}
             isSharing={isSharing}
             isConnected={isConnected}
+            isLoadingImages={isLoadingImages}
+            imageError={imageError}
             notification={notification}
             currentPage={currentPage}
             totalPages={totalPages}
