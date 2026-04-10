@@ -53,7 +53,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      className={`${geistSans.variable} ${geistMono.variable} ${notoTamil.variable} h-full antialiased dark`}
     >
       <body className="h-screen overflow-hidden flex flex-col bg-[#050402] text-[#e5d5c5]">
         {children}

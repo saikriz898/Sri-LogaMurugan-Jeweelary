@@ -1,5 +1,5 @@
 import React from 'react';
-import { Upload, Loader2, Sparkles } from 'lucide-react';
+import { Upload, Loader2 } from 'lucide-react';
 
 interface PhotoUploadPanelProps {
   onUploadPhotos: (files: FileList) => void;
